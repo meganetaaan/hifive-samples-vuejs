@@ -40,8 +40,8 @@
       },
 
       toggleAll () {
-        const isDone = this._vm.count !== this._vm.leftCount
-        this._data.list.forEach((i) => {i.done = isDone})
+        const isAnyLeft = this._vm.count !== this._vm.leftCount
+        this._data.list.forEach((i) => {i.done = !isAnyLeft})
       },
 
       // event handler
