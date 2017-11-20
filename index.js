@@ -13,8 +13,18 @@
       _vm: null,
       _data: {
         listName: 'TODO',
-        list: [],
-        mode: 'all'
+        list: [{
+          title: 'hoge',
+          done: false
+        }, {
+          title: 'fuga',
+          done: false
+        }, {
+          title: 'piyo',
+          done: false
+        }
+      ],
+        mode: TODO_FILTER.ALL
       },
 
       // lifetime method
@@ -40,8 +50,12 @@
       },
 
       toggleAll () {
-        const isAnyLeft = this._vm.count !== this._vm.leftCount
+        const isAnyLeft = this._vm.count !== this._vm.leftCount // access computed
         this._data.list.forEach((i) => {i.done = !isAnyLeft})
+      },
+
+      setFilter (mode) {
+        this._data.mode = mode;
       },
 
       // event handler
@@ -67,6 +81,11 @@
         this.toggleAll()
       },
 
+      '.set-filter-button click' (_, $el) {
+        const modeKey = $el.val()
+        this.setFilter(TODO_FILTER[modeKey])
+      },
+
       // private method
       _bindView() {
         this._vm = new Vue({
@@ -79,9 +98,12 @@
           <input type="submit" class="add-button" value="add" />
         </form>
         {{leftCount}} items left.
+          <input type="button" class="set-filter-button" value="ALL" />
+          <input type="button" class="set-filter-button" value="ACTIVE" />
+          <input type="button" class="set-filter-button" value="COMPLETED" />
           <input type="button" class="toggle-all-button" value="toggle all" />
           <ul>
-            <li v-for="(item, index) of list" class="list-item">
+            <li v-for="(item, index) of filteredList" class="list-item">
               <span class="done-button" :data-h5-index="index">[{{item.done ? '✓' : '　'}}]</span>
               <span>
                 <s v-if="item.done">{{item.title}}</s>
@@ -99,6 +121,16 @@
             },
             leftCount () {
               return this.list.filter((i) => {return !i.done}).length
+            },
+            filteredList () {
+              switch (this.mode) {
+                case TODO_FILTER.ALL:
+                  return this.list
+                case TODO_FILTER.ACTIVE:
+                  return this.list.filter((i) => {return !i.done})
+                case TODO_FILTER.COMPLETED:
+                  return this.list.filter((i) => {return i.done})
+              }
             }
           }
         });
